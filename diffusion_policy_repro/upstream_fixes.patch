@@ -1,0 +1,35 @@
+diff --git a/diffusion_policy/env_runner/pusht_keypoints_runner.py b/diffusion_policy/env_runner/pusht_keypoints_runner.py
+index a16bd58..b581a28 100644
+--- a/diffusion_policy/env_runner/pusht_keypoints_runner.py
++++ b/diffusion_policy/env_runner/pusht_keypoints_runner.py
+@@ -133,7 +133,7 @@ class PushTKeypointsRunner(BaseLowdimRunner):
+             env_prefixs.append('test/')
+             env_init_fn_dills.append(dill.dumps(init_fn))
+ 
+-        env = AsyncVectorEnv(env_fns)
++        env = AsyncVectorEnv(env_fns, shared_memory=False)
+ 
+         # test env
+         # env.reset(seed=env_seeds)
+diff --git a/diffusion_policy/gym_util/async_vector_env.py b/diffusion_policy/gym_util/async_vector_env.py
+index dfb0f62..ca2fba3 100644
+--- a/diffusion_policy/gym_util/async_vector_env.py
++++ b/diffusion_policy/gym_util/async_vector_env.py
+@@ -186,7 +186,7 @@ class AsyncVectorEnv(VectorEnv):
+         _, successes = zip(*[pipe.recv() for pipe in self.parent_pipes])
+         self._raise_if_errors(successes)
+ 
+-    def reset_async(self):
++    def reset_async(self, seed=None, options=None, **kwargs):
+         self._assert_is_running()
+         if self._state != AsyncState.DEFAULT:
+             raise AlreadyPendingCallError(
+@@ -199,7 +199,7 @@ class AsyncVectorEnv(VectorEnv):
+             pipe.send(("reset", None))
+         self._state = AsyncState.WAITING_RESET
+ 
+-    def reset_wait(self, timeout=None):
++    def reset_wait(self, timeout=None, seed=None, options=None, **kwargs):
+         """
+         Parameters
+         ----------
