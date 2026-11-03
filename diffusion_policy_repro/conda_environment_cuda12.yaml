@@ -1,4 +1,4 @@
-name: robodiff_cu12
+name: robodiff
 channels:
   - conda-forge
 dependencies:
